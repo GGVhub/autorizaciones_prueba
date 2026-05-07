@@ -10,6 +10,7 @@ from io import BytesIO
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from utils import require_page_access, get_connection, fmt_currency
+from sqlalchemy import text
 
 require_page_access("notas_pedido")
 
@@ -22,12 +23,15 @@ conn = get_connection()
 ARG  = timezone(timedelta(hours=-3))
 
 def load_data():
-    return conn.query(
-        """SELECT * FROM formularios
-           WHERE autorizado1 = TRUE AND autorizado2 = TRUE
-           ORDER BY fecha_aut2 DESC""",
-        ttl=0
-    )
+    with conn.session as session:
+        result = session.execute(text("""
+            SELECT * FROM formularios
+            WHERE autorizado1 = TRUE AND autorizado2 = TRUE
+            ORDER BY fecha_aut2 DESC
+        """))
+        rows = result.fetchall()
+        cols = result.keys()
+    return pd.DataFrame(rows, columns=cols)
 
 try:
     df = load_data()
