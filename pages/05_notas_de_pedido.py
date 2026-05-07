@@ -57,10 +57,10 @@ except Exception as e:
 
 # ─── Separar en dos grupos ─────────────────────────────────────────────────
 df["nota_de_pedido"] = df["nota_de_pedido"].astype(str).str.strip()
-df["nota_de_pedido"] = df["nota_de_pedido"].replace({"nan": "", "None": ""})
+df["nota_de_pedido"] = df["nota_de_pedido"].replace({"nan": "", "None": "", "none": "", "null": "", "NULL": ""})
 
-df_sin_nota = df[df["nota_de_pedido"] == ""].copy()
-df_con_nota = df[df["nota_de_pedido"] != ""].copy()
+df_sin_nota = df[df["nota_de_pedido"].str.strip() == ""].copy()
+df_con_nota = df[df["nota_de_pedido"].str.strip() != ""].copy()
 
 # ─── KPIs ──────────────────────────────────────────────────────────────────
 c1, c2, c3, c4 = st.columns(4)
