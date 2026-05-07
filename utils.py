@@ -30,12 +30,20 @@ def require_page_access(page_slug: str):
         st.stop()
 
 @st.cache_resource
+
 def get_connection():
     try:
         return st.connection("postgres", type="sql")
     except Exception as e:
         st.error(f"❌ No se pudo conectar a la base de datos: {e}")
         st.stop()
+
+def query_fresh(sql: str, params: dict = None):
+    """Query sin caché — siempre lee datos frescos de la BD."""
+    conn = get_connection()
+    if params:
+        return conn.query(sql, params=params, ttl=0)
+    return conn.query(sql, ttl=0)
 
 def fmt_currency(val) -> str:
     try:
