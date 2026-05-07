@@ -38,15 +38,12 @@ st.stop()
 
 
 def load_data():
-    with conn.session as session:
-        result = session.execute(text("""
-            SELECT * FROM formularios
-            WHERE autorizado1 = TRUE AND autorizado2 = TRUE
-            ORDER BY fecha_aut2 DESC
-        """))
-        rows = result.fetchall()
-        cols = result.keys()
-    return pd.DataFrame(rows, columns=cols)
+    return conn.query(
+        """SELECT * FROM formularios
+           WHERE autorizado1 = TRUE AND autorizado2 = TRUE
+           ORDER BY fecha_aut2 DESC""",
+        ttl=0
+    )
 
 try:
     df = load_data()
@@ -57,11 +54,17 @@ except Exception as e:
 
 
 # ─── Separar en dos grupos ─────────────────────────────────────────────────
-df["nota_de_pedido"] = df["nota_de_pedido"].astype(str).str.strip()
-df["nota_de_pedido"] = df["nota_de_pedido"].replace({"nan": "", "None": "", "none": "", "null": "", "NULL": ""})
+def es_nota_vacia(val):
+    if val is None:
+        return True
+    return str(val).strip().lower() in ("", "nan", "none", "null")
 
-df_sin_nota = df[df["nota_de_pedido"].str.strip() == ""].copy()
-df_con_nota = df[df["nota_de_pedido"].str.strip() != ""].copy()
+df["nota_de_pedido"] = df["nota_de_pedido"].apply(
+    lambda x: "" if es_nota_vacia(x) else str(x).strip()
+)
+
+df_sin_nota = df[df["nota_de_pedido"] == ""].copy()
+df_con_nota = df[df["nota_de_pedido"] != ""].copy()
 
 # ─── KPIs ──────────────────────────────────────────────────────────────────
 c1, c2, c3, c4 = st.columns(4)
