@@ -22,19 +22,7 @@ st.caption("Formularios con doble autorización aprobada, listos para emitir not
 conn = get_connection()
 ARG  = timezone(timedelta(hours=-3))
 
-# ─── DEBUG TEMPORAL ────────────────────────────────────────────────────────
-st.warning("🔍 DEBUG ACTIVO — borrar después")
 
-df_debug = pd.read_sql(
-    "SELECT id, solicitante, autorizado1, autorizado2, nota_de_pedido FROM formularios ORDER BY id",
-    conn._instance
-)
-st.write(f"**Total registros en BD:** {len(df_debug)}")
-st.write(f"**Con aut1=TRUE y aut2=TRUE:** {len(df_debug[(df_debug['autorizado1']==True) & (df_debug['autorizado2']==True)])}")
-st.write(f"**Sin nota (de esos):** {len(df_debug[(df_debug['autorizado1']==True) & (df_debug['autorizado2']==True) & (df_debug['nota_de_pedido'].isna() | (df_debug['nota_de_pedido']==''))])}")
-st.dataframe(df_debug)
-st.stop()
-# ─── FIN DEBUG ──────────────────────────────────────────────────────────────
 
 
 def load_data():
