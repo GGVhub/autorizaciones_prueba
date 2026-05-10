@@ -182,7 +182,7 @@ if "formulario_guardado" not in st.session_state:
     st.session_state.formulario_guardado = False
 require_page_access("formulario")
 
-FECHA_LIMITE = datetime(2026, 5, 6, 8, 00, 0, tzinfo=timezone(timedelta(hours=-3)))
+FECHA_LIMITE = datetime(2026, 5, 20, 8, 00, 0, tzinfo=timezone(timedelta(hours=-3)))
 ahora = datetime.now(timezone(timedelta(hours=-3)))
 
 if ahora > FECHA_LIMITE:
